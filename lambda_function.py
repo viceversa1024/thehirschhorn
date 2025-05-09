@@ -97,6 +97,7 @@ def get_signed_urls(s3, event, barcode):
             "Bucket": BUCKET_NAME,
             "Key": json_key,
             "ContentType": "application/json",
+            "ACL": "bucket-owner-full-control",
         },
         ExpiresIn=EXPIRE_SECONDS,
     )
@@ -108,7 +109,7 @@ def lambda_handler(event, context):
     clear_cookie = False
     upload_urls = None
     print("Event: ", event)
-    jwt_token = event.get("headers", {}).get("Cookie", None)
+    jwt_token = event.get("headers", {}).get("cookie", None)
     if jwt_token:
         try:
             user = jwt_decode(jwt_token.split("=")[1])["email"]
@@ -118,7 +119,7 @@ def lambda_handler(event, context):
             user = None
     else:
         user = None
-    print(user)
+    print(f"user: {user}")
     s3 = boto3.client(
         "s3", region_name="us-east-2", config=Config(s3={"addressing_style": "virtual"})
     )
@@ -172,10 +173,12 @@ def lambda_handler(event, context):
     back_image_url = f"{image_url_base}/{barcode}.back.jpg"
     json_full_url = f"{image_url_base}/{barcode}.json"
     response = requests.get(json_full_url)
+    print(f"json_full_url: {json_full_url}")
+    print(f"response: {response}")
     if response.status_code == 200:
         try:
             json_data = response.json()
-            dimensions = json_data.get("dimensions", "")
+            dimensions = json_data.get("dimensions", "foo")
             price = json_data.get("price", "")
             notes = json_data.get("notes", "")
         except ValueError:
@@ -183,7 +186,7 @@ def lambda_handler(event, context):
             price = ""
             notes = ""
     else:
-        dimensions = ""
+        dimensions = "foo"
         price = ""
         notes = ""
 
