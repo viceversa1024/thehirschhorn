@@ -88,11 +88,17 @@ def do_upload(s3, event, barcode):
 
 
 def lambda_handler(event, context):
+    clear_cookie = False
     upload_urls = None
     print("Event: ", event)
     jwt_token = event.get("headers", {}).get("Cookie", None)
     if jwt_token:
-        user = jwt_decode(jwt_token.split("=")[1])["email"]
+        try:
+            user = jwt_decode(jwt_token.split("=")[1])["email"]
+        except jwt.ExpiredSignatureError:
+            print("JWT token expired")
+            clear_cookie = True
+            user = None
     else:
         user = None
     print(user)
@@ -162,27 +168,17 @@ def lambda_handler(event, context):
         path=path,
         front_image_url=front_image_url,
         back_image_url=back_image_url,
+        user=user,
     )
 
+    headers = {"Content-Type": "text/html"}
+
+    if clear_cookie:
+        headers["Set-Cookie"] = (
+            "keene_jwt=; Path=/; Expires=Thu, 01 Jan 1970 00:00:00 GMT"
+        )
     return {
         "statusCode": 200,
         "body": rendered_html,
-        "headers": {
-            "Content-Type": "text/html",
-            "Cookie": "keene_jwt=eyJraWQiOiJ3RmJUMElVdVdadk9BMkdNODBrOWYyUVhvdnFrXC81YUt1NWNVN1p6TmpJVT0iLCJhbGciOiJSUzI1NiJ9.eyJhdF9oYXNoIjoicGdPeGpjRGRKcjk3T0RNRFNiMEotUSIsInN1YiI6Ijg0YjhjNDg4LWMwOTEtNzA3Yy1lMGFkLWRhNTY4N2NlNjA5MiIsImVtYWlsX3ZlcmlmaWVkIjp0cnVlLCJpc3MiOiJodHRwczpcL1wvY29nbml0by1pZHAudXMtZWFzdC0xLmFtYXpvbmF3cy5jb21cL3VzLWVhc3QtMV81cjMwSkZuQ2siLCJjb2duaXRvOnVzZXJuYW1lIjoiODRiOGM0ODgtYzA5MS03MDdjLWUwYWQtZGE1Njg3Y2U2MDkyIiwiYXVkIjoiN2NpN24wcDdvbDRlb2VlcDk2Z3BrbmRic3AiLCJldmVudF9pZCI6IjBhMDIwN2M3LWRkYjYtNGUxMC1iYTllLTgyODBhMjg1MDI2MCIsInRva2VuX3VzZSI6ImlkIiwiYXV0aF90aW1lIjoxNzQ2NzUyMDU0LCJleHAiOjE3NDY3NTU2NTQsImlhdCI6MTc0Njc1MjA1NCwianRpIjoiZmM3MzgwYmQtODQ5ZS00NTU3LWFlMjQtNDNjZjRlNThiNTc1IiwiZW1haWwiOiJ3YXRlcm1haEB1Y2kuZWR1In0.HmVTmSAT2XeiAgmDnOs33yl3l-2IF5qrahEg6oiz2_TZtCY0eOQrdXGqiyjlPTwY_jT9okWfhLRhwrPpIujn4Xigj8gOkItdhvtBkGRRBSuQKpLq8W_i3veyZh-h6Csg3O9slhURKbABV4SlnYsLO5y4BOsMY97QH2c2Sx78cC3-uItdLeJ6y3q9PgcV8IRcLBjM-ns7ZUKQm_InBEXPIHPkj1TVmxjDMW6WuvyBvkzpU2GsQviV7x0fKdbbdIwoMtjbQ7HoIiN-P5rfetQ6NbZCsfd1vrZfetyHHl_Avor-2ygApMYvFoKJU0rB5SW96jNi1z2Tcr9X_k_2oyFENA",
-        },
+        "headers": headers,
     }
-
-
-print(
-    lambda_handler(
-        {
-            "httpMethod": "GET",
-            "path": "/test",
-            "headers": {
-                "Cookie": "keene_jwt=eyJraWQiOiJ3RmJUMElVdVdadk9BMkdNODBrOWYyUVhvdnFrXC81YUt1NWNVN1p6TmpJVT0iLCJhbGciOiJSUzI1NiJ9.eyJhdF9oYXNoIjoicGdPeGpjRGRKcjk3T0RNRFNiMEotUSIsInN1YiI6Ijg0YjhjNDg4LWMwOTEtNzA3Yy1lMGFkLWRhNTY4N2NlNjA5MiIsImVtYWlsX3ZlcmlmaWVkIjp0cnVlLCJpc3MiOiJodHRwczpcL1wvY29nbml0by1pZHAudXMtZWFzdC0xLmFtYXpvbmF3cy5jb21cL3VzLWVhc3QtMV81cjMwSkZuQ2siLCJjb2duaXRvOnVzZXJuYW1lIjoiODRiOGM0ODgtYzA5MS03MDdjLWUwYWQtZGE1Njg3Y2U2MDkyIiwiYXVkIjoiN2NpN24wcDdvbDRlb2VlcDk2Z3BrbmRic3AiLCJldmVudF9pZCI6IjBhMDIwN2M3LWRkYjYtNGUxMC1iYTllLTgyODBhMjg1MDI2MCIsInRva2VuX3VzZSI6ImlkIiwiYXV0aF90aW1lIjoxNzQ2NzUyMDU0LCJleHAiOjE3NDY3NTU2NTQsImlhdCI6MTc0Njc1MjA1NCwianRpIjoiZmM3MzgwYmQtODQ5ZS00NTU3LWFlMjQtNDNjZjRlNThiNTc1IiwiZW1haWwiOiJ3YXRlcm1haEB1Y2kuZWR1In0.HmVTmSAT2XeiAgmDnOs33yl3l-2IF5qrahEg6oiz2_TZtCY0eOQrdXGqiyjlPTwY_jT9okWfhLRhwrPpIujn4Xigj8gOkItdhvtBkGRRBSuQKpLq8W_i3veyZh-h6Csg3O9slhURKbABV4SlnYsLO5y4BOsMY97QH2c2Sx78cC3-uItdLeJ6y3q9PgcV8IRcLBjM-ns7ZUKQm_InBEXPIHPkj1TVmxjDMW6WuvyBvkzpU2GsQviV7x0fKdbbdIwoMtjbQ7HoIiN-P5rfetQ6NbZCsfd1vrZfetyHHl_Avor-2ygApMYvFoKJU0rB5SW96jNi1z2Tcr9X_k_2oyFENA"
-            },
-        },
-        None,
-    )
-)

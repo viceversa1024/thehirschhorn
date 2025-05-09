@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Hirschhorn: {{barcode}}</title>
+    <style>
+        body {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            margin: 0;
+            font-family: Arial, sans-serif;
+            text-align: center;
+        }
+
+        img {
+            cursor: pointer;
+            transition: transform 0.6s;
+            max-width: 40%;
+            height: auto;
+        }
+
+        img.flipped {
+            transform: rotateY(180deg);
+        }
+
+        .text {
+            margin-bottom: 20px;
+            font-size: 1.2em;
+            font-weight: bold;
+        }
+
+        /* Media query for mobile devices */
+        @media (max-width: 768px) {
+            img {
+                max-width: 100%;
+            }
+        }
+    </style>
+    <script>
+    const img = new Image();
+    img.src = "{{front_image_url}}"; // Preloads the image
+    img.src = "{{back_image_url}}"; // Preloads the image
+    </script>
+</head>
+<body>
+    {% if user %}
+    <div style="position: absolute; top: 10px; right: 10px; border: 1px solid #ccc; padding: 10px; background-color: #f9f9f9; border-radius: 5px; text-align: right;">
+        <h3 style="margin: 0;">You are logged in as {{user}}</h3>
+        <p style="margin: 5px 0 0;"><a href="/logout">Logout</a></p>
+    </div>
+    <h1>{{title}}</h1>
+    <h2>Steve Keene</h2>
+    <h3>{{barcode}}</h3>
+    <p class="text">Click piece to see back</p>
+    <img id="flipImage" src="{{front_image_url}}" alt="{{barcode}}" onclick="flipImage()">
+    
+    <script>
+        function flipImage() {
+            const img = document.getElementById('flipImage');
+            if (img.src.includes('front')) {
+                img.src = '{{back_image_url}}';
+            } else {
+                img.src = '{{front_image_url}}';
+            }
+            img.classList.toggle('flipped');
+        }
+    </script>
+    {% else %}
+    <h1>{{title}}</h1>
+    <h2>Steve Keene</h2>
+    <h3>{{barcode}}</h3>
+    <p class="text">Click piece to see back</p>
+    <img id="flipImage" src="{{front_image_url}}" alt="{{barcode}}" onclick="flipImage()">
+    
+    <script>
+        function flipImage() {
+            const img = document.getElementById('flipImage');
+            if (img.src.includes('front')) {
+                img.src = '{{back_image_url}}';
+            } else {
+                img.src = '{{front_image_url}}';
+            }
+            img.classList.toggle('flipped');
+        }
+    </script>
+    {% endif %}
+</body>
+</html>

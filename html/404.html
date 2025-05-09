@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{barcode}} not found</title>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+        document.getElementById('upload-form').addEventListener('submit', async function (e) {
+          e.preventDefault();
+          const password = document.getElementById('password').value;
+          const frontFile = document.getElementById('frontpicture').files[0];
+          const backFile = document.getElementById('backpicture').files[0];
+        
+          if (!frontFile || !backFile) {
+            alert("Both files are required");
+            return;
+          }
+         const response = await fetch(window.location.pathname, {
+                 method: "POST",
+                    headers: {
+                "Content-Type": "application/x-www-form-urlencoded"
+                },
+                body: `password=${encodeURIComponent(password)}`
+                });
+        const { front_url, back_url } = await response.json();
+        console.log(frontFile);
+        console.log(backFile);
+        
+          await fetch(front_url, {
+            method: "PUT",
+            headers: { "Content-Type": frontFile.type, "x-amz-acl": "public-read" },
+            body: frontFile
+          });
+        
+          await fetch(back_url, {
+            method: "PUT",
+            headers: { "Content-Type": backFile.type, "x-amz-acl": "public-read" },
+            body: backFile
+          });
+        
+          alert("Upload complete! Press OK to reload");
+          window.location.href = window.location.href;
+        });
+    });
+        </script>
+        
+    <style>
+        body {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            margin: 0;
+            font-family: Arial, sans-serif;
+            text-align: center;
+            background-color: #f8f8f8;
+            color: #333;
+        }
+
+        h1 {
+            font-size: 3em;
+            margin-bottom: 20px;
+            color: #d9534f;
+        }
+
+        p {
+            font-size: 1.2em;
+            margin-bottom: 20px;
+        }
+
+        form {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+        }
+
+        input[type="password"],
+        input[type="file"] {
+            padding: 10px;
+            font-size: 1em;
+        }
+
+        button {
+            padding: 10px 20px;
+            font-size: 1em;
+            background-color: #5cb85c;
+            color: white;
+            border: none;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+
+        button:hover {
+            background-color: #4cae4c;
+        }
+    </style>
+</head>
+<body>
+    {% if user %}
+        <h3>You are logged in as {{user}}</h3>
+        <p><a href="/logout">Logout</a></p>
+        <h1>Piece {{barcode}} Not Found</h1>
+        <p>Create this page?</p>
+        <div style="border: 2px solid black; padding: 20px; border-radius: 10px; width: fit-content;">
+            <form id="upload-form">
+            <label for="frontpicture">Front Picture:</label>
+            <input type="file" id="frontpicture" accept="image/jpeg" required>
+            <label for="backpicture">Back Picture:</label>
+            <input type="file" id="backpicture" accept="image/jpeg" required>
+            <input type="text" id="dimensions" placeholder="Dimensions (e.g., 10x15)" required>
+            <input type="text" id="price" placeholder="Price in $" required>
+            <textarea id="notes" placeholder="Additional notes" required></textarea>
+            <button type="submit">Submit</button>
+            </form>
+        </div>
+    {% else %}
+        <p><a href="https://us-east-15r30jfnck.auth.us-east-1.amazoncognito.com/login?client_id=7ci7n0p7ol4eoeep96gpkndbsp&response_type=token&scope=aws.cognito.signin.user.admin+email+openid+phone+profile&redirect_uri=https%3A%2F%2Fthehirschhorn.com">Login</a></p>
+        <h1>Piece {{barcode}} Not Found</h1>
+        {% endif %}
+</body>
+</html>

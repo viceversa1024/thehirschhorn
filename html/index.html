@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Hirschhorn</title>
+<script>
+    (function storeKeeneJwtFromHash() {
+  const hash = window.location.hash;
+
+  // Look for #id_token=... or &id_token=...
+  const match = hash.match(/[&#]id_token=([^&]+)/);
+  if (!match) return;
+
+  const jwt = decodeURIComponent(match[1]);
+
+  // Store in cookie
+  document.cookie = `keene_jwt=${jwt}; path=/; secure; samesite=strict; max-age=86400`;
+
+  // Optional: clean up the URL so the token isn't visible in the hash
+  history.replaceState(null, "", window.location.pathname + window.location.search);
+})();
+</script>
+</head>
+<body>
+    <h1>Welcome to the Hirschhorn Collection</h1>
+    <p>Hello World.</p>
+</body>
+</html>
