@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -27,7 +28,9 @@
             transform: rotateY(180deg);
         }
 
-        h1, h2, h3 {
+        h1,
+        h2,
+        h3 {
             font-weight: bold;
         }
 
@@ -36,6 +39,7 @@
             font-size: 1.2em;
             font-weight: normal;
         }
+
         /* Media query for mobile devices */
         @media (max-width: 768px) {
             img {
@@ -44,17 +48,19 @@
         }
     </style>
     <script>
-    const img = new Image();
-    img.src = "{{front_image_url}}"; // Preloads the image
-    img.src = "{{back_image_url}}"; // Preloads the image
-    function onLogout() {
+        const img = new Image();
+        img.src = "{{front_image_url}}"; // Preloads the image
+        img.src = "{{back_image_url}}"; // Preloads the image
+        function onLogout() {
             window.location.href = "https://us-east-15r30jfnck.auth.us-east-1.amazoncognito.com/logout?client_id=7ci7n0p7ol4eoeep96gpkndbsp&logout_uri=https%3A%2F%2Fthehirschhorn.com";
         }
     </script>
 </head>
+
 <body>
     {% if user %}
-    <div style="position: absolute; top: 10px; right: 10px; border: 1px solid #ccc; padding: 10px; background-color: #f9f9f9; border-radius: 5px; text-align: right;">
+    <div
+        style="position: absolute; top: 10px; right: 10px; border: 1px solid #ccc; padding: 10px; background-color: #f9f9f9; border-radius: 5px; text-align: right;">
         <h3 style="margin: 0;">You are logged in as {{user}}</h3>
         <p><a href="#" onclick="onLogout()">Logout</a></p>
     </div>
@@ -77,7 +83,7 @@
         <p class="text">Dimensions: {{dimensions}}</p>
         <p class="text">Price: ${{price}}</p>
         <p class="text">Additional notes: {{notes}}</p>
-    </div>    
+    </div>
     {% else %}
     <h1>{{title}}</h1>
     <h2>Steve Keene</h2>
@@ -101,4 +107,5 @@
     </div>
     {% endif %}
 </body>
+
 </html>

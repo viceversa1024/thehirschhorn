@@ -62,8 +62,8 @@ def get_signed_urls(s3, event, barcode):
     }
 
     # Now you can use `password`, `front`, `back` safely
-    #print("Front:", front)
-    #print("Back:", back)
+    # print("Front:", front)
+    # print("Back:", back)
 
     front_key = f"{barcode}.front.jpg"
     back_key = f"{barcode}.back.jpg"
