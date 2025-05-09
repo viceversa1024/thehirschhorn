@@ -45,7 +45,7 @@ def object_exists(s3, bucket_name, object_key):
             raise
 
 
-def do_upload(s3, event, barcode):
+def get_signed_urls(s3, event, barcode):
     body = event["body"]
     if event.get("isBase64Encoded", False):
         body = base64.b64decode(body).decode()
@@ -97,7 +97,6 @@ def do_upload(s3, event, barcode):
             "Bucket": BUCKET_NAME,
             "Key": json_key,
             "ContentType": "application/json",
-            "ACL": "public-read",
         },
         ExpiresIn=EXPIRE_SECONDS,
     )
@@ -128,7 +127,7 @@ def lambda_handler(event, context):
         path = None
         s3_object = None
     elif "path" in event and len(event["path"]) > 1:
-        s3_object = f"{event['path'][1:]}.front.jpg"
+        s3_object = f"{event['path'][1:]}.json"
         path = event["path"]
         template_name = None
     else:
@@ -139,7 +138,7 @@ def lambda_handler(event, context):
     dumped_event = json.dumps(event)
     print(template_name)
     if event["httpMethod"] == "POST":
-        message, status = do_upload(s3, event, event["path"][1:])
+        message, status = get_signed_urls(s3, event, event["path"][1:])
         if status != 200:
             return {
                 "statusCode": status,
@@ -148,7 +147,6 @@ def lambda_handler(event, context):
             }
         else:
             print("generated signed urls")
-
             upload_urls = message
             print(upload_urls)
             print(status)
@@ -172,6 +170,23 @@ def lambda_handler(event, context):
         barcode = ""
     front_image_url = f"{image_url_base}/{barcode}.front.jpg"
     back_image_url = f"{image_url_base}/{barcode}.back.jpg"
+    json_full_url = f"{image_url_base}/{barcode}.json"
+    response = requests.get(json_full_url)
+    if response.status_code == 200:
+        try:
+            json_data = response.json()
+            dimensions = json_data.get("dimensions", "")
+            price = json_data.get("price", "")
+            notes = json_data.get("notes", "")
+        except ValueError:
+            dimensions = ""
+            price = ""
+            notes = ""
+    else:
+        dimensions = ""
+        price = ""
+        notes = ""
+
     # Set up the Jinja2 environment to load templates from the 'html' directory
     env = Environment(loader=FileSystemLoader("./html"))
 
@@ -187,6 +202,9 @@ def lambda_handler(event, context):
         front_image_url=front_image_url,
         back_image_url=back_image_url,
         user=user,
+        dimensions=dimensions,
+        price=price,
+        notes=notes,
     )
 
     headers = {"Content-Type": "text/html"}

@@ -1,62 +1,66 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{{barcode}} not found</title>
     <script>
+        function onLogout() {
+            window.location.href = "https://us-east-15r30jfnck.auth.us-east-1.amazoncognito.com/logout?client_id=7ci7n0p7ol4eoeep96gpkndbsp&logout_uri=https%3A%2F%2Fthehirschhorn.com";
+        }
         document.addEventListener('DOMContentLoaded', function () {
-        document.getElementById('upload-form').addEventListener('submit', async function (e) {
-          e.preventDefault();
-          const frontFile = document.getElementById('frontpicture').files[0];
-          const backFile = document.getElementById('backpicture').files[0];
-        
-          if (!frontFile || !backFile) {
-            alert("Both files are required");
-            return;
-          }
-         const response = await fetch(window.location.pathname, {
-                 method: "POST",
-                    headers: {
-                "Content-Type": "application/x-www-form-urlencoded"
-                },
-                body: new URLSearchParams({foo: "bar",})
-        });
-        const { front_url, back_url, json_url } = await response.json();
-        
-          await fetch(front_url, {
-            method: "PUT",
-            headers: { "Content-Type": frontFile.type, "x-amz-acl": "public-read" },
-            body: frontFile
-          });
-        
-          await fetch(back_url, {
-            method: "PUT",
-            headers: { "Content-Type": backFile.type, "x-amz-acl": "public-read" },
-            body: backFile
-          });
+            document.getElementById('upload-form').addEventListener('submit', async function (e) {
+                e.preventDefault();
+                const frontFile = document.getElementById('frontpicture').files[0];
+                const backFile = document.getElementById('backpicture').files[0];
 
-            const dimensions = document.getElementById('dimensions').value;
-            const price = document.getElementById('price').value;
-            const notes = document.getElementById('notes').value;
-            const data = {
-                dimensions: dimensions,
-                price: price,
-                notes: notes
-            };
-            const jsonData = JSON.stringify(data);
-          await fetch(json_url, {
-            method: "PUT",
-            headers: { "Content-Type": "application/json", "x-amz-acl": "public-read" },
-            body: jsonData
-          });
-        
-          alert("Upload complete! Press OK to reload");
-          window.location.href = window.location.href;
+                if (!frontFile || !backFile) {
+                    alert("Both files are required");
+                    return;
+                }
+                const response = await fetch(window.location.pathname, {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/x-www-form-urlencoded"
+                    },
+                    body: new URLSearchParams({ foo: "bar", })
+                });
+                const { front_url, back_url, json_url } = await response.json();
+
+                await fetch(front_url, {
+                    method: "PUT",
+                    headers: { "Content-Type": frontFile.type, "x-amz-acl": "public-read" },
+                    body: frontFile
+                });
+
+                await fetch(back_url, {
+                    method: "PUT",
+                    headers: { "Content-Type": backFile.type, "x-amz-acl": "public-read" },
+                    body: backFile
+                });
+
+                const dimensions = document.getElementById('dimensions').value;
+                const price = document.getElementById('price').value;
+                const notes = document.getElementById('notes').value;
+                const data = {
+                    dimensions: dimensions,
+                    price: price,
+                    notes: notes
+                };
+                const jsonData = JSON.stringify(data);
+                await fetch(json_url, {
+                    method: "PUT",
+                    headers: { "Content-Type": "application/json", "x-amz-acl": "public-read" },
+                    body: jsonData
+                });
+
+                alert("Upload complete! Press OK to reload");
+                window.location.href = window.location.href;
+            });
         });
-    });
-        </script>
-        
+    </script>
+
     <style>
         body {
             display: flex;
@@ -110,14 +114,17 @@
         }
     </style>
 </head>
+
 <body>
     {% if user %}
-        <h3>You are logged in as {{user}}</h3>
-        <p><a href="/logout">Logout</a></p>
-        <h1>Piece {{barcode}} Not Found</h1>
-        <p>Create this page?</p>
-        <div style="border: 2px solid black; padding: 20px; border-radius: 10px; width: fit-content;">
-            <form id="upload-form">
+    <div style="position: absolute; top: 10px; right: 10px; border: 1px solid #ccc; padding: 10px; background-color: #f9f9f9; border-radius: 5px; text-align: right;">
+        <h3 style="margin: 0;">You are logged in as {{user}}</h3>
+        <p><a href="#" onclick="onLogout()">Logout</a></p>
+    </div>
+    <h1>Piece {{barcode}} Not Found</h1>
+    <p>Create this page?</p>
+    <div style="border: 2px solid black; padding: 20px; border-radius: 10px; width: fit-content;">
+        <form id="upload-form">
             <label for="frontpicture">Front Picture:</label>
             <input type="file" id="frontpicture" accept="image/jpeg" required>
             <label for="backpicture">Back Picture:</label>
@@ -126,11 +133,14 @@
             <input type="text" id="price" placeholder="Price in $" required>
             <textarea id="notes" placeholder="Additional notes"></textarea>
             <button type="submit">Submit</button>
-            </form>
-        </div>
+        </form>
+    </div>
     {% else %}
-        <p><a href="https://us-east-15r30jfnck.auth.us-east-1.amazoncognito.com/login?client_id=7ci7n0p7ol4eoeep96gpkndbsp&response_type=token&scope=aws.cognito.signin.user.admin+email+openid+phone+profile&redirect_uri=https%3A%2F%2Fthehirschhorn.com">Login</a></p>
-        <h1>Piece {{barcode}} Not Found</h1>
-        {% endif %}
+    <p><a
+            href="https://us-east-15r30jfnck.auth.us-east-1.amazoncognito.com/login?client_id=7ci7n0p7ol4eoeep96gpkndbsp&response_type=token&scope=aws.cognito.signin.user.admin+email+openid+phone+profile&redirect_uri=https%3A%2F%2Fthehirschhorn.com">Login</a>
+    </p>
+    <h1>Piece {{barcode}} Not Found</h1>
+    {% endif %}
 </body>
+
 </html>
