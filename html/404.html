@@ -8,7 +8,6 @@
         document.addEventListener('DOMContentLoaded', function () {
         document.getElementById('upload-form').addEventListener('submit', async function (e) {
           e.preventDefault();
-          const password = document.getElementById('password').value;
           const frontFile = document.getElementById('frontpicture').files[0];
           const backFile = document.getElementById('backpicture').files[0];
         
@@ -21,11 +20,9 @@
                     headers: {
                 "Content-Type": "application/x-www-form-urlencoded"
                 },
-                body: `password=${encodeURIComponent(password)}`
-                });
-        const { front_url, back_url } = await response.json();
-        console.log(frontFile);
-        console.log(backFile);
+                body: new URLSearchParams({foo: "bar",})
+        });
+        const { front_url, back_url, json_url } = await response.json();
         
           await fetch(front_url, {
             method: "PUT",
@@ -37,6 +34,21 @@
             method: "PUT",
             headers: { "Content-Type": backFile.type, "x-amz-acl": "public-read" },
             body: backFile
+          });
+
+            const dimensions = document.getElementById('dimensions').value;
+            const price = document.getElementById('price').value;
+            const notes = document.getElementById('notes').value;
+            const data = {
+                dimensions: dimensions,
+                price: price,
+                notes: notes
+            };
+            const jsonData = JSON.stringify(data);
+          await fetch(json_url, {
+            method: "PUT",
+            headers: { "Content-Type": "application/json", "x-amz-acl": "public-read" },
+            body: jsonData
           });
         
           alert("Upload complete! Press OK to reload");
@@ -112,7 +124,7 @@
             <input type="file" id="backpicture" accept="image/jpeg" required>
             <input type="text" id="dimensions" placeholder="Dimensions (e.g., 10x15)" required>
             <input type="text" id="price" placeholder="Price in $" required>
-            <textarea id="notes" placeholder="Additional notes" required></textarea>
+            <textarea id="notes" placeholder="Additional notes"></textarea>
             <button type="submit">Submit</button>
             </form>
         </div>

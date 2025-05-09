@@ -55,13 +55,19 @@ def do_upload(s3, event, barcode):
     # Extract values
     front = form_data.get("frontpicture", [""])[0]
     back = form_data.get("backpicture", [""])[0]
+    json = {
+        "dimensions": form_data.get("dimensions", [""])[0],
+        "price": form_data.get("price", [""])[0],
+        "notes": form_data.get("notes", [""])[0],
+    }
 
     # Now you can use `password`, `front`, `back` safely
-    print("Front:", front)
-    print("Back:", back)
+    #print("Front:", front)
+    #print("Back:", back)
 
     front_key = f"{barcode}.front.jpg"
     back_key = f"{barcode}.back.jpg"
+    json_key = f"{barcode}.json"
 
     front_url = s3.generate_presigned_url(
         "put_object",
@@ -84,7 +90,19 @@ def do_upload(s3, event, barcode):
         },
         ExpiresIn=EXPIRE_SECONDS,
     )
-    return {"front_url": front_url, "back_url": back_url}, 200
+
+    json_url = s3.generate_presigned_url(
+        "put_object",
+        Params={
+            "Bucket": BUCKET_NAME,
+            "Key": json_key,
+            "ContentType": "application/json",
+            "ACL": "public-read",
+        },
+        ExpiresIn=EXPIRE_SECONDS,
+    )
+
+    return {"front_url": front_url, "back_url": back_url, "json_url": json_url}, 200
 
 
 def lambda_handler(event, context):
