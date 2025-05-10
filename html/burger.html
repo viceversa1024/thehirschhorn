@@ -1,0 +1,13 @@
+<div id="burger-div" style="position: absolute; top: 10px; right: 10px;">
+    <div id="hamburger-menu" style="cursor: pointer; font-size: 24px;">☰</div>
+    <div id="dropdown-menu"
+        style="display: none; border: 1px solid #ccc; padding: 10px; background-color: #f9f9f9; border-radius: 5px; text-align: right;">
+        {% if user %}
+        <h3 style="margin: 0;">You are logged in as {{user}}</h3>
+        <p><a href="#" onclick="onLogout()">Logout</a></p>
+        {% else %}
+        <h3 style="margin: 0;">You are not logged in</h3>
+        <p><a href="{{login_url}}">Login</a></p>
+        {% endif %}
+    </div>
+</div>

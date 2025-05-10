@@ -1,0 +1,19 @@
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const hamburgerMenu = document.getElementById('hamburger-menu');
+        const dropdownMenu = document.getElementById('dropdown-menu');
+        console.log('Hamburger menu:', hamburgerMenu);
+        console.log('Dropdown menu:', dropdownMenu);
+
+        hamburgerMenu.addEventListener('click', () => {
+            console.log('Hamburger menu clicked');
+            if (dropdownMenu.style.display === 'none' || dropdownMenu.style.display === '') {
+                dropdownMenu.style.display = 'block';
+                hamburgerMenu.textContent = '✖';
+            } else {
+                dropdownMenu.style.display = 'none';
+                hamburgerMenu.textContent = '☰';
+            }
+        });
+    });
+</script>

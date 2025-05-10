@@ -1,0 +1,6 @@
+<script>
+    function onLogout() {
+        document.cookie = "keene_jwt=; path=/; secure; samesite=strict; max-age=0"; // Clear the cookie
+        window.location.href = window.location.href; // Reload the page
+    }
+</script>

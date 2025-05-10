@@ -5,11 +5,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{{barcode}} not found</title>
+    {% include 'burger.js.html' %}
+    {% include 'onlogout.js.html' %}
     <script>
-        function onLogout() {
-            document.cookie = "keene_jwt=; path=/; secure; samesite=strict; max-age=0"; // Clear the cookie
-            window.location.href = window.location.href; // Reload the page
-        };
         document.addEventListener('DOMContentLoaded', function () {
             if (document.getElementById('upload-form')) {
                 document.getElementById('upload-form').addEventListener('submit', async function (e) {
@@ -63,19 +61,18 @@
             }
         });
     </script>
-
     <style>
-        body {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            min-height: 100vh;
-            margin: 0;
-            font-family: Arial, sans-serif;
+        .content {
             text-align: center;
-            background-color: #f8f8f8;
-            color: #333;
+        }
+
+        .form-container {
+            border: 2px solid black;
+            padding: 20px;
+            border-radius: 10px;
+            width: fit-content;
+            margin: auto;
+            text-align: center;
         }
 
         h1 {
@@ -119,31 +116,26 @@
 </head>
 
 <body>
-    {% if user %}
-    <div
-        style="position: absolute; top: 10px; right: 10px; border: 1px solid #ccc; padding: 10px; background-color: #f9f9f9; border-radius: 5px; text-align: right;">
-        <h3 style="margin: 0;">You are logged in as {{user}}</h3>
-        <p><a href="#" onclick="onLogout()">Logout</a></p>
+    {% include 'burger.html' %}
+    <div class="content">
+        <h1>SK ART {{barcode}} Not Found</h1>
+        {% if user %}
+        <p>Create this page?</p>
+        <div class="form-container">
+            <form id="upload-form">
+                <label for="frontpicture">Front Picture:</label>
+                <input type="file" id="frontpicture" accept="image/jpeg" required>
+                <label for="backpicture">Back Picture:</label>
+                <input type="file" id="backpicture" accept="image/jpeg" required>
+                <input type="text" id="dimensions" placeholder="Dimensions (e.g., 10x15)" required>
+                <input type="text" id="price" placeholder="Price in $" required>
+                <textarea id="notes" placeholder="Additional notes"></textarea>
+                <button type="submit">Submit</button>
+            </form>
+            {% endif %}
+        </div>
     </div>
-    <h1>SK ART {{barcode}} Not Found</h1>
-    <p>Create this page?</p>
-    <div style="border: 2px solid black; padding: 20px; border-radius: 10px; width: fit-content;">
-        <form id="upload-form">
-            <label for="frontpicture">Front Picture:</label>
-            <input type="file" id="frontpicture" accept="image/jpeg" required>
-            <label for="backpicture">Back Picture:</label>
-            <input type="file" id="backpicture" accept="image/jpeg" required>
-            <input type="text" id="dimensions" placeholder="Dimensions (e.g., 10x15)" required>
-            <input type="text" id="price" placeholder="Price in $" required>
-            <textarea id="notes" placeholder="Additional notes"></textarea>
-            <button type="submit">Submit</button>
-        </form>
-    </div>
-    {% else %}
-    <p><a href={{login_url}}>Login</a>
-    </p>
-    <h1>SK ART {{barcode}} Not Found</h1>
-    {% endif %}
+
 </body>
 
 </html>

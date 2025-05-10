@@ -5,13 +5,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>The Hirschhorn</title>
+    {% include 'burger.js.html' %}
+    {% include 'onlogout.js.html' %}
     <script>
-        function onLogout() {
-            document.cookie = "keene_jwt=; path=/; secure; samesite=strict; max-age=0"; // Clear the cookie
-            window.location.href = window.location.href; // Reload the page
-        };
-
-
         function parseHashFragment(fragment) {
             if (fragment.startsWith("#")) {
                 fragment = fragment.substring(1);
@@ -24,8 +20,6 @@
             }
             return result;
         }
-
-
         (function storeKeeneJwtFromHash() {
             const hash = window.location.hash;
             var return_state = "";
@@ -44,41 +38,8 @@
 </head>
 
 <body>
+    {% include 'burger.html' %}
     <h1>Welcome to the Hirschhorn Collection</h1>
-    {% if user %}
-    <div
-        style="position: absolute; top: 10px; right: 10px; border: 1px solid #ccc; padding: 10px; background-color: #f9f9f9; border-radius: 5px; text-align: right;">
-        <h3 style="margin: 0;">You are logged in as {{user}}</h3>
-        <p><a href="#" onclick="onLogout()">Logout</a></p>
-    </div>
-    {% else %}
-    <div style="position: absolute; top: 10px; right: 10px;">
-        <div id="hamburger-menu" style="cursor: pointer; font-size: 24px;">☰</div>
-        <div id="dropdown-menu"
-            style="display: none; border: 1px solid #ccc; padding: 10px; background-color: #f9f9f9; border-radius: 5px; text-align: right;">
-            <h3 style="margin: 0;">You are not logged in</h3>
-            <p>
-                <a href="{{login_url}}">
-                    Login
-                </a>
-            </p>
-        </div>
-    </div>
-    <script>
-        const hamburgerMenu = document.getElementById('hamburger-menu');
-        const dropdownMenu = document.getElementById('dropdown-menu');
-
-        hamburgerMenu.addEventListener('click', () => {
-            if (dropdownMenu.style.display === 'none' || dropdownMenu.style.display === '') {
-                dropdownMenu.style.display = 'block';
-                hamburgerMenu.textContent = '✖'; // Change to close icon
-            } else {
-                dropdownMenu.style.display = 'none';
-                hamburgerMenu.textContent = '☰'; // Change back to hamburger icon
-            }
-        });
-    </script>
-    {% endif %}
 </body>
 
 </html>
