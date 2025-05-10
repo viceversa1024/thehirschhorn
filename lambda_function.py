@@ -137,7 +137,7 @@ def lambda_handler(event, context):
         path = None
 
     dumped_event = json.dumps(event)
-    print(template_name)
+    print(f"template_name: {template_name}")
     if event["httpMethod"] == "POST":
         message, status = get_signed_urls(s3, event, event["path"][1:])
         if status != 200:
@@ -156,6 +156,17 @@ def lambda_handler(event, context):
                 "body": json.dumps(upload_urls),
                 "headers": {"Content-Type": "application/json"},
             }
+    if event["httpMethod"] == "DELETE":
+        print("delete")
+        for file in ["front.jpg", "back.jpg", "json"]:
+            delete_file_name = f"{event['path'][1:]}.{file}"
+            print(f"delete_file_name: {delete_file_name}")
+            s3.delete_object(Bucket=BUCKET_NAME, Key=delete_file_name)
+        return {
+        "statusCode": 200,
+        "body": json.dumps({"message": "Delete request received"}),
+        "headers": {"Content-Type": "application/json"},
+    }
     else:
         if template_name != "index.html":
             if s3_object and object_exists(s3, BUCKET_NAME, s3_object):
