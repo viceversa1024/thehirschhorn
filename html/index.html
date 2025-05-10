@@ -1,29 +1,84 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>The Hirschhorn</title>
-<script>
-    (function storeKeeneJwtFromHash() {
-  const hash = window.location.hash;
+    <script>
+        function onLogout() {
+            document.cookie = "keene_jwt=; path=/; secure; samesite=strict; max-age=0"; // Clear the cookie
+            window.location.href = window.location.href; // Reload the page
+        };
 
-  // Look for #id_token=... or &id_token=...
-  const match = hash.match(/[&#]id_token=([^&]+)/);
-  if (!match) return;
 
-  const jwt = decodeURIComponent(match[1]);
+        function parseHashFragment(fragment) {
+            if (fragment.startsWith("#")) {
+                fragment = fragment.substring(1);
+            }
+            const result = {};
+            const pairs = fragment.split("&");
+            for (const pair of pairs) {
+                const [key, value] = pair.split("=");
+                result[decodeURIComponent(key)] = decodeURIComponent(value || "");
+            }
+            return result;
+        }
 
-  // Store in cookie
-  document.cookie = `keene_jwt=${jwt}; path=/; secure; samesite=strict; max-age=86400`;
 
-  // Optional: clean up the URL so the token isn't visible in the hash
-  history.replaceState(null, "", window.location.pathname + window.location.search);
-})();
-</script>
+        (function storeKeeneJwtFromHash() {
+            const hash = window.location.hash;
+            var return_state = "";
+            if (return_state = parseHashFragment(window.location.hash).state) {
+                return_state = return_state.substring(1);
+                console.log("return_state", return_state);
+            }
+            const match = hash.match(/[&#]id_token=([^&]+)/);
+            if (!match) return;
+            const jwt = decodeURIComponent(match[1]);
+            document.cookie = `keene_jwt=${jwt}; path=/; secure; samesite=strict; max-age=86400`;
+            const trimmed_url = window.location.href.replace(hash, "");
+            window.location.href = trimmed_url + (return_state ? return_state : "");
+        })();
+    </script>
 </head>
+
 <body>
     <h1>Welcome to the Hirschhorn Collection</h1>
-    <p>Hello World.</p>
+    {% if user %}
+    <div
+        style="position: absolute; top: 10px; right: 10px; border: 1px solid #ccc; padding: 10px; background-color: #f9f9f9; border-radius: 5px; text-align: right;">
+        <h3 style="margin: 0;">You are logged in as {{user}}</h3>
+        <p><a href="#" onclick="onLogout()">Logout</a></p>
+    </div>
+    {% else %}
+    <div style="position: absolute; top: 10px; right: 10px;">
+        <div id="hamburger-menu" style="cursor: pointer; font-size: 24px;">☰</div>
+        <div id="dropdown-menu"
+            style="display: none; border: 1px solid #ccc; padding: 10px; background-color: #f9f9f9; border-radius: 5px; text-align: right;">
+            <h3 style="margin: 0;">You are not logged in</h3>
+            <p>
+                <a href="{{login_url}}">
+                    Login
+                </a>
+            </p>
+        </div>
+    </div>
+    <script>
+        const hamburgerMenu = document.getElementById('hamburger-menu');
+        const dropdownMenu = document.getElementById('dropdown-menu');
+
+        hamburgerMenu.addEventListener('click', () => {
+            if (dropdownMenu.style.display === 'none' || dropdownMenu.style.display === '') {
+                dropdownMenu.style.display = 'block';
+                hamburgerMenu.textContent = '✖'; // Change to close icon
+            } else {
+                dropdownMenu.style.display = 'none';
+                hamburgerMenu.textContent = '☰'; // Change back to hamburger icon
+            }
+        });
+    </script>
+    {% endif %}
 </body>
+
 </html>

@@ -189,6 +189,20 @@ def lambda_handler(event, context):
         dimensions = "foo"
         price = ""
         notes = ""
+    redirect_uri = urllib.parse.quote_plus(
+        "http://localhost:8080"
+        if os.environ.get("LOCAL_LAMBDA")
+        else "https://thehirschhorn.com"
+    )
+    login_url = (
+        "https://us-east-15r30jfnck.auth.us-east-1.amazoncognito.com/login/continue?"
+        + "client_id=7ci7n0p7ol4eoeep96gpkndbsp&"
+        + f"redirect_uri={redirect_uri}&"
+        + "response_type=token&"
+        + "scope=aws.cognito.signin.user.admin+email+openid+phone+profile&"
+        + (f"state={path}" if path else "")
+    )
+    print(f"login_url: {login_url}")
 
     # Set up the Jinja2 environment to load templates from the 'html' directory
     env = Environment(loader=FileSystemLoader("./html"))
@@ -208,6 +222,7 @@ def lambda_handler(event, context):
         dimensions=dimensions,
         price=price,
         notes=notes,
+        login_url=login_url,
     )
 
     headers = {"Content-Type": "text/html"}
