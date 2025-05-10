@@ -69,7 +69,6 @@
 
         .form-container {
             border: 2px solid black;
-            padding: 20px;
             border-radius: 10px;
             width: fit-content;
             margin: auto;
@@ -99,7 +98,6 @@
             padding: 10px;
             font-size: 1em;
         }
-
         button {
             padding: 10px 20px;
             font-size: 1em;
@@ -108,8 +106,8 @@
             border: none;
             cursor: pointer;
             border-radius: 5px;
+            margin-bottom: 10px;
         }
-
         button:hover {
             background-color: #4cae4c;
         }
@@ -124,7 +122,7 @@
         <p>Create this page?</p>
         <div class="form-container">
             <form id="upload-form">
-                <label for="frontpicture">Front Picture:</label>
+                <label for="frontpicture" style="padding-top: 10px;">Front Picture:</label>
                 <input type="file" id="frontpicture" accept="image/jpeg" required>
                 <label for="backpicture">Back Picture:</label>
                 <input type="file" id="backpicture" accept="image/jpeg" required>
