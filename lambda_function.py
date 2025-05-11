@@ -183,12 +183,15 @@ def lambda_handler(event, context):
     front_image_url = f"{image_url_base}/{barcode}.front.jpg"
     back_image_url = f"{image_url_base}/{barcode}.back.jpg"
     print(f"barcode: {barcode}.json")
-    response = s3.get_object(
-        Bucket=BUCKET_NAME,
-        Key=f"{barcode}.json",
-    )
-    json_data = json.loads(response["Body"].read().decode("utf-8"))
-    dimensions = json_data.get("dimensions", "foo")
+    try:
+        response = s3.get_object(
+            Bucket=BUCKET_NAME,
+            Key=f"{barcode}.json",)
+        json_data = json.loads(response["Body"].read().decode("utf-8"))
+    except ClientError as e:
+        print(f"Key: {e}")
+        json_data = {}
+    dimensions = json_data.get("dimensions", "")
     price = json_data.get("price", "")
     notes = json_data.get("notes", "")
     redirect_uri = urllib.parse.quote_plus(

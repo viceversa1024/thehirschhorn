@@ -1,4 +1,5 @@
 #!/bin/bash
+source .venv/bin/activate
 set -e
 rm -rf build
 mkdir -p build
