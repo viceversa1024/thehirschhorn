@@ -25,7 +25,8 @@
         });
 
         document.addEventListener('DOMContentLoaded', function () {
-            const deleteButton = document.querySelector('form button[type="submit"]');
+            const deleteButton = document.querySelector('#deleteform');
+            const editButton = document.querySelector('#editsubmit');
             if (deleteButton) {
                 deleteButton.addEventListener('click', function (event) {
                     if (window.confirm('Are you sure you want to delete this page?')) {
@@ -48,6 +49,33 @@
                     }
                 });
             }
+            if (editButton) {
+                editButton.addEventListener('click', function (event) {
+                    if (window.confirm('Are you sure you want to edit this page?')) {
+                        event.preventDefault();
+                        console.log('Edit action confirmed');
+
+                        fetch(`{{path}}`, {
+                            method: 'PUT',
+                            headers: {
+                                'Content-Type': 'application/json'
+                            },
+                            body: JSON.stringify({
+                                dimensions: document.querySelector('input[name="dimensions"]').value,
+                                price: document.querySelector('input[name="price"]').value,
+                                notes: document.querySelector('input[name="notes"]').value
+                            })
+                        });
+
+                        alert("Page edited successfully! Press OK to reload");
+                        window.location.href = window.location.href;
+
+                    } else {
+                        console.log('Edit action cancelled');
+                        event.preventDefault();
+                    }
+                });
+            }
         });
     </script>
 
@@ -56,6 +84,7 @@
             font-weight: bold;
             font-style: normal;
         }
+
         .content {
             text-align: center;
             margin: 1em;
@@ -108,19 +137,37 @@
         <h1>{{title}}</h1>
         <h2>STEVE KEENE ART {{barcode}}</h2>
         <img id="flipImage" src="{{front_image_url}}" alt="{{barcode}}" onclick="flipImage()">
-        <div class="details">
-            <p class="text"><em>Size:</em> {{dimensions}}</p>
-            <p class="text"><em>Price:</em> ${{price}}</p>
-            <p class="text" style="word-wrap: break-word;"><em>Notes:</em> {{notes}}</p>
-        </div>
     </div>
     {% if user %}
-    <form method="DELETE" action="/delete/{{barcode}}" style="text-align: center; margin-top: 20px;">
+    <form id="editform" method="PUT" action="/update/{{barcode}}" class="details">
+        <p class="text">
+            <em>Size:</em>
+            <input type="text" name="dimensions" value="{{dimensions}}" style="width: 80%;">
+        </p>
+        <p class="text">
+            <em>Price:</em>
+            <input type="text" name="price" value="{{price}}" style="width: 80%;">
+        </p>
+        <p class="text" style="word-wrap: break-word;">
+            <em>Notes:</em>
+            <input type="text" name="notes" value="{{notes}}" style="width: 80%;">
+        </p>
+        <button id="editsubmit" type="submit" style="background-color: #0074D9; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; margin-top: 10px;">
+            Submit changes
+        </button>
+    </form>
+    <form id="deleteform" method="DELETE" action="/delete/{{barcode}}" style="text-align: center; margin-top: 20px;">
         <button type="submit"
             style="background-color: red; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer;">
             Delete (reset) page
         </button>
     </form>
+    {% else %}
+            <div class="details">
+            <p class="text"><em>Size:</em> {{dimensions}}</p>
+            <p class="text"><em>Price:</em> ${{price}}</p>
+            <p class="text" style="word-wrap: break-word;"><em>Notes:</em> {{notes}}</p>
+        </div>
     {% endif %}
 </body>
 

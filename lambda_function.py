@@ -166,7 +166,22 @@ def lambda_handler(event, context):
         "statusCode": 200,
         "body": json.dumps({"message": "Delete request received"}),
         "headers": {"Content-Type": "application/json"},
-    }
+        }
+    
+    if event["httpMethod"] == "PUT":
+        print(event)
+        s3.put_object(
+            Bucket=BUCKET_NAME,
+            Key=f"{event['path'][1:]}.json",
+            Body=event["body"],
+            ContentType="application/json",
+            ACL="bucket-owner-full-control",
+        )
+        return {
+        "statusCode": 200,
+        "body": json.dumps({"message": "Edit request received"}),
+        "headers": {"Content-Type": "application/json"},
+        }
     else:
         if template_name != "index.html":
             if s3_object and object_exists(s3, BUCKET_NAME, s3_object):
